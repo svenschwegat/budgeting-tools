@@ -1,0 +1,33 @@
+[
+    {
+        "input": {
+            "key_word": "bankstatement",
+            "file_name": "bankstatement-25-01.pdf",
+            "file_path": "C:\\example\\path"
+        },
+
+        "output": {
+            "file_path": "C:\\example\\path"
+        },
+
+        "categories": {
+            "file_name": "categories.json",
+            "file_path": "C:\\example\\path"
+        }
+    },
+    {
+        "first_page": {
+            "begin_key_word": "your key word",
+            "end_key_word": "your key word"
+        },
+        "middle_page": {
+            "begin_key_word": "your key word",
+            "end_key_word": "your key word"	
+        },
+        "last_page": {
+            "begin_key_word": "your key word",
+            "end_key_word": "your key word"
+        }
+    }
+
+]

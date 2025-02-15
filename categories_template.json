@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "main_category": "unused main category name",
+        "sub_category": "read category name",
+        "type": "unused income or expense",
+        "mapping": ["key_words", "to", "identify", "category"]
+    }
+]
