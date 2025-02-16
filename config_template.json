@@ -6,6 +6,11 @@
             "file_path": "C:\\example\\path"
         },
 
+        "input_csv": {
+            "file_name": "bankstatement-25-01.csv",
+            "file_path": "C:\\example\\path"
+        },
+
         "output": {
             "file_path": "C:\\example\\path"
         },
@@ -27,6 +32,11 @@
         "last_page": {
             "begin_key_word": "your key word",
             "end_key_word": "your key word"
+        },
+        "csv": {
+            "delimiter": ";",
+            "avoid_key_word": "your key word",
+            "key_word": "your key word"
         }
     }
 

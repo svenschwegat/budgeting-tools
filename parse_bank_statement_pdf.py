@@ -94,7 +94,7 @@ def create_json(items):
 
             if purpose_amount_match:
                 purpose = purpose_amount_match.group(1).strip()
-                amount = float(purpose_amount_match.group(3).replace(',', '.'))
+                amount = float(purpose_amount_match.group(3).replace('.', '').replace(',', '.'))
                 category = get_category(purpose)
 
                 json_item = {
