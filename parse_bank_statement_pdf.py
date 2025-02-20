@@ -1,43 +1,40 @@
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from datetime import datetime
 import re
 import json
 
 def init():
-    input_file_path = read_files()
-    items = extract_text(input_file_path)
-    json_list = create_json(items)
-    write_to_file(json_list)
+    config = get_config()
+    categories = get_categories(config)
+    input_file_path = get_input_file_path(config)
+    items = extract_text(config, input_file_path)
+    json_list = create_json(categories, items)
+    write_to_file(config, input_file_path, json_list)
 
-    if category_not_found > 0:
-        print('Categories not found:', category_not_found, 'out of', len(json_list))
-    else: 
-        print('All categories found for', len(json_list), 'items')
-    
-def read_files():
+def get_config():
     # config.json contains file paths and key words, see config_template
     with open('config.json', 'r', encoding = 'utf-8') as file:
-        global config
         config = json.load(file)
 
-    categories_file_path = config[0]['categories']['file_path'] + '\\' + config[0]['categories']['file_name']
+    return config
 
+def get_categories(config):
     # categories.json contains mapping of keywords to categories, see categories_template
+    categories_file_path = config[0]['categories']['file_path'] + '\\' + config[0]['categories']['file_name']
+    
     with open(categories_file_path, 'r', encoding = 'utf-8') as file:
-        global global_mapping_categories
-        global_mapping_categories = json.load(file)
+        categories = json.load(file)
     
-    global input_file_name
+    return categories
+
+def get_input_file_path(config):
     input_file_name = config[0]['input']['file_name']
-    input_file_path = config[0]['input']['file_path'] + '\\' + input_file_name    
-    
-    global category_not_found
-    category_not_found = 0
+    input_file_path = config[0]['input']['file_path'] + '\\' + input_file_name
      
     return input_file_path
 
-def extract_text(file_path):
-    reader = PdfReader(file_path)
+def extract_text(config, input_file_path):
+    reader = PdfReader(input_file_path)
     number_of_pages = len(reader.pages)
     items = []
 
@@ -73,7 +70,8 @@ def get_relevant_content(text, begin_key_word, end_key_word):
     item = re.split(f'(?={pattern})', data)
     return item
 
-def create_json(items):
+def create_json(categories, items):
+    category_not_found = 0
     json_list = []
     name = 'Kartenumsatz'
     for item in items:
@@ -95,7 +93,7 @@ def create_json(items):
             if purpose_amount_match:
                 purpose = purpose_amount_match.group(1).strip()
                 amount = float(purpose_amount_match.group(3).replace('.', '').replace(',', '.'))
-                category = get_category(purpose)
+                category, category_not_found = get_category(purpose, categories, category_not_found)
 
                 json_item = {
                     "date": date,
@@ -108,12 +106,13 @@ def create_json(items):
             else:
                 print('Purpose and amount not found @ ' + item)
     
+    if category_not_found > 0:
+        print('Categories not found:', category_not_found, 'out of', len(json_list))
+    else: 
+        print('All categories found for', len(json_list), 'items')
     return json_list
 
-def get_category(purpose):
-    categories = global_mapping_categories
-    global category_not_found
-
+def get_category(purpose, categories, category_not_found):
     for i in categories:
         if any(keywords.lower() in purpose.lower() for keywords in i['mapping']):
             category = i['sub_category']
@@ -123,13 +122,14 @@ def get_category(purpose):
 
     if category == categories[-1]['sub_category']:
         category_not_found += 1
-    return category
 
-def write_to_file(json_list):
+    return category, category_not_found
+
+def write_to_file(config, input_file_path, json_list):
     # Extract current year and month and write to file
     key_word = config[0]['input']['key_word']
     pattern = '(?:' + key_word + r'-)(\d{2}\-\d{2})' 
-    match = re.search(pattern, input_file_name)
+    match = re.search(pattern, input_file_path)
     if match:
         output_file_name = match.group(1) + '-output-' + key_word + '.json'
     else:
