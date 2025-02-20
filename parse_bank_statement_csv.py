@@ -3,51 +3,48 @@ import json
 import re
 
 def init():
-    input_file_path = read_files()
-    json_list = parse_csv(input_file_path)
-    write_to_file(json_list)
-
-    if category_not_found > 0:
-        print('Categories not found:', category_not_found, 'out of', len(json_list))
-    else: 
-        print('All categories found for', len(json_list), 'items')
-
-def read_files():
-    # config.json contains file paths and key words, see config_template
-    with open('config.json', 'r', encoding = 'utf-8') as file:
-        global config
-        config = json.load(file)
-
-    categories_file_path = config[0]['categories']['file_path'] + '\\' + config[0]['categories']['file_name']
-
-    # categories.json contains mapping of keywords to categories, see categories_template
-    with open(categories_file_path, 'r', encoding = 'utf-8') as file:
-        global global_mapping_categories
-        global_mapping_categories = json.load(file)
-    
-    global input_file_name
-    input_file_name = config[0]['input_csv']['file_name']
-    input_file_path = config[0]['input_csv']['file_path'] + '\\' + input_file_name
-    
-    global year_month_input
+    config = get_config()
+    categories = get_categories(config)
     year_month_input = input('What year and month (YY-MM):')
 
-    global category_not_found
-    category_not_found = 0 
+    input_file_path = get_input_file_path(config)
+    json_list = parse_csv(config, categories, year_month_input, input_file_path)
+    write_to_file(config, year_month_input, json_list)
+
+def get_config():
+    # config.json contains file paths and key words, see config_template
+    with open('config.json', 'r', encoding = 'utf-8') as file:
+        config = json.load(file)
+
+    return config
+
+def get_categories(config):
+    # categories.json contains mapping of keywords to categories, see categories_template
+    categories_file_path = config[0]['categories']['file_path'] + '\\' + config[0]['categories']['file_name']
+    
+    with open(categories_file_path, 'r', encoding = 'utf-8') as file:
+        categories = json.load(file)
+    
+    return categories
+
+def get_input_file_path(config):
+    input_file_name = config[0]['input_csv']['file_name']
+    input_file_path = config[0]['input_csv']['file_path'] + '\\' + input_file_name
      
     return input_file_path
 
-def parse_csv(file_path):
+def parse_csv(config, categories, year_month_input, input_file_path):
     input_pattern = r'(\d{2})-(\d{2})'
     match_input = re.match(input_pattern, year_month_input)
     requested_year = match_input.group(1)
     requested_month = match_input.group(2)
 
-    with open(file_path, 'r', encoding = 'utf-8') as file:
+    with open(input_file_path, 'r', encoding = 'utf-8') as file:
         lines = file.readlines()
 
     delimiter = config[1]['csv']['delimiter']
     json_list = []
+    category_not_found = 0
     date_pattern = r'^\d{2}\.(\d{2})\.(\d{2})'
     avoid_key_word = config[1]['csv']['avoid_key_word']
 
@@ -80,7 +77,7 @@ def parse_csv(file_path):
                 date = None
                 print('Date not found @ ' + item)
 
-            category = get_category(name, purpose, amount)
+            category, category_not_found = get_category(categories, category_not_found, name, purpose, amount)
 
             json_item = {
                     "date": date,
@@ -91,12 +88,13 @@ def parse_csv(file_path):
                 }
             json_list.append(json_item)
 
+    if category_not_found > 0:
+        print('Categories not found:', category_not_found, 'out of', len(json_list))
+    else: 
+        print('All categories found for', len(json_list), 'items')
     return json_list
 
-def get_category(name, purpose, amount):
-    categories = global_mapping_categories
-    global category_not_found
-
+def get_category(categories, category_not_found, name, purpose, amount):
     for i in categories:
         if any(keywords.lower() in purpose.lower() for keywords in i['mapping']):
             category = i['sub_category']
@@ -112,9 +110,10 @@ def get_category(name, purpose, amount):
 
     if category == categories[-1]['sub_category']:
         category_not_found += 1
-    return category
+        
+    return category, category_not_found
 
-def write_to_file(json_list):
+def write_to_file(config, year_month_input, json_list):
     csv_key_word = config[1]['csv']['key_word']
     output_file_name = year_month_input + '-output-' + csv_key_word + '.json'
     output_file_path = config[0]['output']['file_path'] + '\\' + output_file_name
