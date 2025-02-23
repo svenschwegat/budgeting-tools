@@ -12,12 +12,19 @@
         },
 
         "output": {
-            "file_path": "C:\\example\\path"
+            "file_path": "C:\\example\\path",
+            "file_name": "output.json"
         },
-
         "categories": {
             "file_name": "categories.json",
             "file_path": "C:\\example\\path"
+        },
+        "sqlite": {
+            "file_name": "database.db",
+            "file_path": "C:\\example\\path",
+            "table_name": "table_name",
+            "row_names": "date, name, purpose, amount, category",
+            "value_names": ":date, :name, :purpose, :amount, :category"
         }
     },
     {
@@ -39,5 +46,4 @@
             "key_word": "your key word"
         }
     }
-
 ]
