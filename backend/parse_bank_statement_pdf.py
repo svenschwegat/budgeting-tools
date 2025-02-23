@@ -140,6 +140,5 @@ def write_to_file(config, input_file_path, json_list):
         json.dump(json_list, file, indent = 4)
 
     print('Output file created @', output_file_path)
-    return output_file_path
 
 init()

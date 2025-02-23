@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
 
 import parse_bank_statement_pdf
+import test_py
 
 
 class Item(BaseModel):
@@ -50,6 +51,12 @@ async def parse_pdf(): #file: UploadFile = File(...)
     result = parse_bank_statement_pdf #.parse("temp.pdf")
     
     return {"result": result}
+
+@app.get("/test")
+async def test():
+    result = test_py.init()
+    return result
+
 
 if(__name__ == "__init__"):
     uvicorn.run(app, host="0.0.0.0", port=8000)
