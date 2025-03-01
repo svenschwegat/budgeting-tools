@@ -115,7 +115,7 @@ def get_category(categories, category_not_found, name, purpose, amount):
 
 def write_to_file(config, year_month_input, json_list):
     csv_key_word = config[1]['csv']['key_word']
-    output_file_name = year_month_input + '-output-' + csv_key_word + '.json'
+    output_file_name = '20' + year_month_input + '-output-' + csv_key_word + '.json'
     output_file_path = config[0]['output']['file_path'] + '\\' + output_file_name
     with open(output_file_path, 'w') as file:
         json.dump(json_list, file, indent = 4)

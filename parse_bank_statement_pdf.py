@@ -131,7 +131,7 @@ def write_to_file(config, input_file_path, json_list):
     pattern = '(?:' + key_word + r'-)(\d{2}\-\d{2})' 
     match = re.search(pattern, input_file_path)
     if match:
-        output_file_name = match.group(1) + '-output-' + key_word + '.json'
+        output_file_name = '20' + match.group(1) + '-output-' + key_word + '.json'
     else:
         output_file_name = 'failed_naming_output.json'
 
