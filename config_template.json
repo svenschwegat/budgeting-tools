@@ -13,7 +13,8 @@
 
         "output": {
             "file_path": "C:\\example\\path",
-            "file_name": "output.json"
+            "file_name": "output.json",
+            "file_name_2": "output-2.json"
         },
         "categories": {
             "file_name": "categories.json",
